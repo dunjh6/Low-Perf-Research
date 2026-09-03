@@ -1,0 +1,19 @@
+#### Plot BedMaster Alarm Frequency and Duration
+#### Leland Dunwoodie
+#### 9/3/26
+
+setwd("/Users/lelanddunwoodie/Documents/CCHMC/Research/")
+
+lowperfdata = read.table("CNX-alarm-data-R.txt", header = TRUE, sep = '\t')
+
+PatientCodes = unique(lowperfdata$PatientCode)
+
+for (i in PatientCodes) {
+lowperfdataplot = subset(lowperfdata, PatientCode == i)
+datacollectionhours = -lowperfdataplot[1,10]/3600
+arrestlocation = lowperfdataplot[1,11]
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = paste0("Patient Code: ", i, ", Patient Category: ", lowperfdataplot[1,2], ", Hours of Data Collection (Dashed Line): ", round(datacollectionhours, digits=2), ", Arrest Location: ", arrestlocation), size=2) + xlim(-72,0) + geom_vline(xintercept = -datacollectionhours, color="gray", linetype="dashed", linewidth=0.5)
+file_name = paste0("plot_",i,".png")
+ggsave(filename = file_name, plot = plot_name, width = 5, height = 5, dpi = 300)
+}
+

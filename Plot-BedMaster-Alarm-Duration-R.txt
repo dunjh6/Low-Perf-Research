@@ -1,0 +1,121 @@
+#### Plot BedMaster Alarm Frequency and Duration
+#### Leland Dunwoodie
+#### 9/3/26
+
+setwd("/Users/lelanddunwoodie/Documents/CCHMC/Research/")
+
+lowperfdata = read.table("CNX-alarm-data-R.txt", header = TRUE, sep = '\t')
+
+#### Scatterplot for each patient
+PatientCodes = unique(lowperfdata$PatientCode)
+for (i in PatientCodes) {
+lowperfdataplot = subset(lowperfdata, PatientCode == i)
+datacollectionhours = lowperfdataplot$DataCollectionStart[1]/3600
+patientcategory = lowperfdataplot$PatientCategory[1]
+arrestlocation = lowperfdataplot$ArrestLocation[1]
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = paste0("Patient Code: ", i, ", Patient Category: ", patientcategory, ", Hours of Data Collection (Dashed Line): ", round(datacollectionhours, digits=2), ", Arrest Location: ", arrestlocation), size=2) + xlim(-72,0) + geom_vline(xintercept = -datacollectionhours, color="gray", linetype="dashed", linewidth=0.5)
+file_name = paste0("plot_",i,".png")
+ggsave(filename = file_name, plot = plot_name, width = 5, height = 5, dpi = 300)
+}
+
+#### Plot all patients
+plot_name = ggplot(lowperfdata, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: All Patients") + annotate("text", x=-36, y=max(lowperfdata$Duration)+5, label = "49 patients", size=2) + xlim(-72,0)
+ggsave(filename = "All_patients.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+#### Plot by age
+# < 6 mo
+lowperfdataplot = subset(lowperfdata, Age < 0.5)
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: Age < 6 mo") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "8 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Age_under_6mo.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+# 6mo - 23mo
+lowperfdataplot = subset(lowperfdata, 0.5 <= Age)
+lowperfdataplot = subset(lowperfdataplot, Age < 2)
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: Age 6 mo - 23 mo") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "17 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Age_6mo-23mo.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+# 2y - 10y
+lowperfdataplot = subset(lowperfdata, 2 <= Age)
+lowperfdataplot = subset(lowperfdataplot, Age <= 10)
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: Age 2y - 10y") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "7 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Age_2y-10y.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+# > 10y 
+lowperfdataplot = subset(lowperfdata, 10 < Age)
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: Age > 10y") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "13 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Age_over_10y.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+
+#### Plot by Patient Category
+# Hemodynamic No Pressors
+lowperfdataplot = subset(lowperfdata, PatientCategory == "HN")
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: HN") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "Hemodynamic No Pressors: 6 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Category_HN.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+# Hemodynamic Pressors
+lowperfdataplot = subset(lowperfdata, PatientCategory == "HP")
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: HP") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "Hemodynamic Pressors: 14 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Category_HP.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+# Respiratory Not Ventilated
+lowperfdataplot = subset(lowperfdata, PatientCategory == "RN")
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: RN") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "Respiratory Not Ventilated: 8 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Category_RN.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+# Respiratory Ventilated
+lowperfdataplot = subset(lowperfdata, PatientCategory == "RV")
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: RV") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "Respiratory Ventilated: 15 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Category_RV.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+# Other
+lowperfdataplot = subset(lowperfdata, PatientCategory == "Other")
+unique(lowperfdataplot$PatientCode)
+# count # unique patients
+plot_name = ggplot(lowperfdataplot, aes(x=SecondsBeforeArrest/3600, y=Duration)) + geom_point(color="red", size=1, stroke=0) + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (sec)", title="Low Perfusion Alarms: Other") + annotate("text", x=-36, y=max(lowperfdataplot$Duration)+5, label = "Other: 3 patients", size=2) + xlim(-72,0)
+ggsave(filename = "Category_Other.png", plot = plot_name, width = 5, height = 5, dpi = 300)
+
+#### Barplot for each patient summing duration per hour
+
+# create two column matrix with total alarm duration by hour for each patient
+
+PatientCodes = unique(lowperfdata$PatientCode)
+for (i in PatientCodes) {
+lowperfdataplot = subset(lowperfdata, PatientCode == i)
+lowperfdataplot$SecondsBeforeArrest = lowperfdataplot$SecondsBeforeArrest/3600
+names(lowperfdataplot)[names(lowperfdataplot) == "SecondsBeforeArrest"] = "HoursBeforeArrest"
+twocolumnmatrix = data.frame(matrix(0, nrow=72, ncol=2))
+colnames(twocolumnmatrix) = c("Hour", "TotalSeconds")
+for (j in 0:71) {
+hourcounter = subset(lowperfdataplot, trunc(HoursBeforeArrest) == -j)
+twocolumnmatrix[j+1,1] = j
+twocolumnmatrix[j+1,2] = sum(hourcounter$Duration)
+}
+dummy_name = paste0("durationbyhour_",i)
+assign(dummy_name, twocolumnmatrix)
+
+# plot duration by hour (still within loop)
+patientcategory = lowperfdataplot$PatientCategory[1]
+arrestlocation = lowperfdataplot$ArrestLocation[1]
+datacollectionhours = lowperfdataplot$DataCollectionStart[1]/3600
+
+plot_name = ggplot(twocolumnmatrix, aes(x=-Hour, y=TotalSeconds)) + geom_col(fill = "red") + theme_classic() + labs(x="Hours Before Arrest", y="Alarm Duration (total seconds per hour)", title="Low Perfusion Alarms: Total Seconds per Hour") + xlim(-72,1) + geom_vline(xintercept = -datacollectionhours, color="gray", linetype="dashed", linewidth=0.5) + annotate("text", x=-36, y=max(twocolumnmatrix$TotalSeconds)+50, label = paste0("Patient Code: ", i, ", Patient Category: ", patientcategory, ", Hours of Data Collection (Dashed Line): ", round(datacollectionhours, digits=2), ", Arrest Location: ", arrestlocation), size=2)
+file_name = paste0("plot_",i,"_durationbyhour.png")
+ggsave(filename = file_name, plot = plot_name, width = 5, height = 5, dpi = 300)
+
+}
